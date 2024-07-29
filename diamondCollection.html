@@ -31,7 +31,6 @@ const diamondHeight = 64;
 const diamondStart = canvas.height / 2;
 
 const drag = 0.3;
-// const bounceVelocity = -12.5;
 
 let minDiamondSpace = 15;
 let maxDiamondSpace = 20;
@@ -101,15 +100,9 @@ function loop() {
       // diamonds.forEach(function(diamond) {
       //   diamond.y += -player.dy;
       // });
-      // while (diamonds[diamonds.length - 1].y > 0) {
-      //   diamonds.push({
-      //     x: random(25, canvas.width - 25 - diamondWidth),
-      //     y: diamonds[diamonds.length - 1].y - (diamondHeight + random(minDiamondSpace, maxDiamondSpace))
-      //   })
       //   minDiamondSpace += 0.5;
       //   maxDiamondSpace += 0.5;
       //   maxDiamondSpace = Math.min(maxDiamondSpace, canvas.height / 2);
-      // }
     // } else {
     //   player.y += player.dy;
     // }
@@ -186,7 +179,6 @@ function loop() {
     context.font = "20px Arial";
     context.fillText("tap to restart", canvas.width - 15 * 17, canvas.height - 10);
     if (mousedown) {
-      // meters = 0;
       end = false;
     }
   }
@@ -206,7 +198,7 @@ function initialize() {
     y += diamondHeight + random(minDiamondSpace, maxDiamondSpace);
     let x;
     do {
-      x = random(25, canvas.width - 25 - diamondWidth);
+      x = random(55, canvas.width - 55 - diamondWidth);
     } while (
       y > canvas.height / 2 &&
       x > canvas.width / 2 - diamondWidth * 1.5 &&
@@ -235,9 +227,17 @@ function backgroundMove() {
   }
 }
 
+function addElement() {
+  diamonds.push({
+    x: random(55, canvas.width - 55 - diamondWidth),
+    y: canvas.height
+  })
+}
+
 setInterval(display, 120);
 setInterval(decrement, 1000);
 setInterval(backgroundMove, 10);
+setInterval(addElement, 500);
 
 document.addEventListener('mouseup', function(e) {
   mousedown = false;
