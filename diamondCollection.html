@@ -44,6 +44,8 @@ let end = false;
 
 let diamondImage = new Image();
 diamondImage.src = "diamond.png"
+let obstacleImage = new Image();
+obstacleImage.src = "obstacle.png"
 
 let buttonImage = new Image();
 buttonImage.src = "button.png"
@@ -56,9 +58,15 @@ let diamonds = [{
   activ: true
 }];
 
+
 function random(min, max) {
   return Math.random() * (max - min) + min;
 }
+
+let obstacles = [{
+  x: -diamondWidth,
+  y: -diamondHeight
+}];
 
 const player = {
   width: 64,
@@ -143,6 +151,14 @@ function loop() {
       }
     });
 
+    obstacles.forEach(function(obstacle) {
+      if (collide(obstacle)) {
+        initialize();
+        end = true;
+      }
+      context.drawImage(obstacleImage, 0, 0, diamondWidth, diamondHeight, obstacle.x, obstacle.y, diamondWidth / 2, diamondHeight / 2);
+    });
+
     context.drawImage(playerImage, frameOrder[player.currentFrame] * 64, 0, 64, 64, player.x, player.y, player.width, player.height);
 
     context.font = "30px Arial";
@@ -156,6 +172,9 @@ function loop() {
 
     diamonds = diamonds.filter(function(diamond) {
       return diamond.y > -diamondHeight;
+    })
+    obstacles = obstacles.filter(function(obstacle) {
+      return obstacle.y > -diamondHeight;
     })
   } else {
     context.drawImage(background, 0, 0, 320, 480, 0, 0, canvas.width, canvas.height);
@@ -179,6 +198,7 @@ function initialize() {
   maxDiamondSpace = 20;
   player.x = canvas.width / 2 - 32;
   player.y = 74;
+  obstacles = [{x: random(55, canvas.width - 55 - diamondWidth), y:canvas.height}]
   diamonds = [{ x: canvas.width / 2 - diamondWidth / 2, y: diamondStart,  activ: true}]
   let y = diamondStart;
   while (y < canvas.height - diamondHeight) {
@@ -211,6 +231,9 @@ function backgroundMove() {
     diamonds.forEach(function(diamond) {
       diamond.y--;
     });
+    obstacles.forEach(function(obstacle) {
+      obstacle.y--;
+    });
   }
 }
 
@@ -219,6 +242,13 @@ function addElement() {
     x: random(55, canvas.width - 55 - diamondWidth),
     y: canvas.height,
     activ: true
+  })
+}
+
+function addObstacle() {
+  obstacles.push({
+    x: random(55, canvas.width - 55 - diamondWidth),
+    y: canvas.height,
   })
 }
 
@@ -237,6 +267,7 @@ setInterval(display, 120);
 setInterval(decrement, 1000);
 setInterval(backgroundMove, 10);
 setInterval(addElement, 500);
+setInterval(addObstacle, 2000);
 
 document.addEventListener('mouseup', function(e) {
   mousedown = false;
