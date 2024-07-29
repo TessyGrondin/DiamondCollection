@@ -187,9 +187,6 @@ function loop() {
     context.fillText(score, canvas.width / 2, canvas.height / 2);
     context.font = "20px Arial";
     context.fillText("tap to restart", canvas.width / 2, canvas.height - 10);
-    if (mousedown) {
-      end = false;
-    }
   }
 }
 
@@ -241,18 +238,22 @@ function backgroundMove() {
 }
 
 function addElement() {
-  diamonds.push({
-    x: random(55, canvas.width - 55 - diamondWidth),
-    y: canvas.height,
-    activ: true
-  })
+  if (!end) {
+    diamonds.push({
+      x: random(55, canvas.width - 55 - diamondWidth),
+      y: canvas.height,
+      activ: true
+    })
+  }
 }
 
 function addObstacle() {
-  obstacles.push({
-    x: random(55, canvas.width - 55 - diamondWidth),
-    y: canvas.height,
-  })
+  if (!end) {
+    obstacles.push({
+      x: random(55, canvas.width - 55 - diamondWidth),
+      y: canvas.height,
+    })
+  }
 }
 
 function collide(ent) {
@@ -296,6 +297,13 @@ document.addEventListener('mousedown', function(e) {
     player.dx = 3;
   }
 });
+
+document.addEventListener('click', function(e) {
+  if (end) {
+    score = 0;
+    end = false;
+  }
+})
 
 requestAnimationFrame(loop);
 </script>
