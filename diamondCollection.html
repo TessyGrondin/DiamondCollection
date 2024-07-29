@@ -30,25 +30,26 @@ const context = canvas.getContext('2d');
 // const platformHeight = 20;
 // const platformStart = canvas.height - 50;
 
-// const gravity = 0.33;
-// const drag = 0.3;
+const drag = 0.3;
 // const bounceVelocity = -12.5;
 
 // let minPlatformSpace = 15;
 // let maxPlatformSpace = 20;
 
-// let meters = 0;
 let leftState = 0;
 let rightState = 0;
 let time = 60;
+let borderThickness = 30;
 
 let end = false;
 
 // let platformImage = new Image();
-// platformImage.src = "platform.png"
+// platformImage.src = "diamond.png"
 
 let buttonImage = new Image();
 buttonImage.src = "button.png"
+let playerImage = new Image();
+playerImage.src = "mole.png"
 
 // let platforms = [{
 //   x: canvas.width / 2 - platformWidth / 2,
@@ -59,93 +60,89 @@ buttonImage.src = "button.png"
 //   return Math.random() * (max - min) + min;
 // }
 
-// const doodle = {
-//   width: 40,
-//   height: 60,
-//   frog: null,
-//   x: canvas.width / 2 - 20,
-//   y: platformStart - 60,
-//   dx: 0,
-//   dy: 0,
-//   nbFrames: 5,
-//   currentFrame: 0
-// };
+const player = {
+  width: 64,
+  height: 64,
+  x: canvas.width / 2 - 32,
+  y: 74,
+  dx: 0,
+  dy: 0,
+  nbFrames: 4,
+  currentFrame: 0,
+  lastFrame: 2
+};
 
-// doodle.frog = new Image(64, 64);
-// doodle.frog.src = "frog.png";
+let frameOrder = [0, 1, 0, 2];
 
-// let playerDir = 0;
+let playerDir = 0;
 let mousedown = false;
-// let prevDoodleY = doodle.y;
+let prevplayerY = player.y;
 
 let background = new Image(320, 960);
 background.src = "background.png"
 let by = 0;
 let by2 = canvas.height;
 
-// initialize();
+initialize();
 
-// function display() {
-//   doodle.currentFrame += 1;
-//   if (doodle.currentFrame >= doodle.nbFrames)
-//     doodle.currentFrame = 0;
-//   canvas.clearRect(0, 0, canvas.width, canvas.height);
-// }
+function display() {
+  player.currentFrame += 1;
+  if (player.currentFrame >= player.nbFrames)
+    player.currentFrame = 0;
+  canvas.clearRect(0, 0, canvas.width, canvas.height);
+}
 
 function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0,0,canvas.width,canvas.height);
 
   if (!end) {
-    // doodle.dy += gravity;
-
-    // if (doodle.y < canvas.height / 2 && doodle.dy < 0) {
-    //   platforms.forEach(function(platform) {
-    //     platform.y += -doodle.dy;
-    //   });
-    //   while (platforms[platforms.length - 1].y > 0) {
-    //     platforms.push({
-    //       x: random(25, canvas.width - 25 - platformWidth),
-    //       y: platforms[platforms.length - 1].y - (platformHeight + random(minPlatformSpace, maxPlatformSpace))
-    //     })
-    //     minPlatformSpace += 0.5;
-    //     maxPlatformSpace += 0.5;
-    //     maxPlatformSpace = Math.min(maxPlatformSpace, canvas.height / 2);
-    //   }
-    //   meters += -doodle.dy
+    // if (player.y < canvas.height / 2 && player.dy < 0) {
+      // platforms.forEach(function(platform) {
+      //   platform.y += -player.dy;
+      // });
+      // while (platforms[platforms.length - 1].y > 0) {
+      //   platforms.push({
+      //     x: random(25, canvas.width - 25 - platformWidth),
+      //     y: platforms[platforms.length - 1].y - (platformHeight + random(minPlatformSpace, maxPlatformSpace))
+      //   })
+      //   minPlatformSpace += 0.5;
+      //   maxPlatformSpace += 0.5;
+      //   maxPlatformSpace = Math.min(maxPlatformSpace, canvas.height / 2);
+      // }
     // } else {
-    //   doodle.y += doodle.dy;
+    //   player.y += player.dy;
     // }
 
-    // if (!mousedown) {
-    //   if (playerDir < 0) {
-    //     doodle.dx += drag;
+    if (!mousedown) {
+      if (playerDir < 0) {
+        player.dx += drag;
 
-    //     if (doodle.dx > 0) {
-    //       doodle.dx = 0;
-    //       playerDir = 0;
-    //     }
-    //   } else if (playerDir > 0) {
-    //     doodle.dx -= drag;
+        if (player.dx > 0) {
+          player.dx = 0;
+          playerDir = 0;
+        }
+      } else if (playerDir > 0) {
+        player.dx -= drag;
 
-    //     if (doodle.dx < 0) {
-    //       doodle.dx = 0;
-    //       playerDir = 0;
-    //     }
-    //   }
-    // }
+        if (player.dx < 0) {
+          player.dx = 0;
+          playerDir = 0;
+        }
+      }
+    }
 
-    // doodle.x += doodle.dx;
+    player.x += player.dx;
 
-    // if (doodle.x + doodle.width < 0) {
-    //   doodle.x = canvas.width;
-    // } else if (doodle.x > canvas.width) {
-    //   doodle.x = -doodle.width;
-    // }
+    if (player.x < borderThickness) {
+      player.x = borderThickness;
+    } else if (player.x > canvas.width - player.width - borderThickness) {
+      player.x = canvas.width - player.width - borderThickness;
+    }
 
     if (time <= 0) {
       end = true;
-    //   initialize();
+      initialize();
     }
 
     context.drawImage(background, 0, 0, 320, 480, 0, by, canvas.width, canvas.height);
@@ -154,29 +151,29 @@ function loop() {
     // platforms.forEach(function(platform) {
     //   context.drawImage(platformImage, 0, 0, 80, 16, platform.x, platform.y, platformWidth, platformHeight);
 
-    //   if (
-    //     doodle.dy > 0 &&
-    //     prevDoodleY + doodle.height <= platform.y &&
-    //     doodle.x < platform.x + platformWidth &&
-    //     doodle.x + doodle.width > platform.x &&
-    //     doodle.y < platform.y + platformHeight &&
-    //     doodle.y + doodle.height > platform.y
-    //   ) {
-    //     doodle.y = platform.y - doodle.height;
-    //     doodle.dy = bounceVelocity;
-    //   }
+      // if (
+      //   player.dy > 0 &&
+      //   prevplayerY + player.height <= platform.y &&
+      //   player.x < platform.x + platformWidth &&
+      //   player.x + player.width > platform.x &&
+      //   player.y < platform.y + platformHeight &&
+      //   player.y + player.height > platform.y
+      // ) {
+      //   player.y = platform.y - player.height;
+      //   player.dy = bounceVelocity;
+      // }
     // });
 
-    // context.drawImage(doodle.frog, doodle.currentFrame * 64, 0, 64, 64, doodle.x, doodle.y, doodle.width, doodle.height);
+    context.drawImage(playerImage, frameOrder[player.currentFrame] * 64, 0, 64, 64, player.x, player.y, player.width, player.height);
 
     context.font = "30px Arial";
     context.fillStyle = 'yellow';
-    // context.fillText(Math.round(meters), canvas.width - (Math.round(meters).toString().length + 1) * 20, 40)
+    context.fillText(Math.round(player.dx), canvas.width - (Math.round(player.dx).toString().length + 1) * 20, 40)
     context.fillText("Time left : " + time, 10, 40)
 
     context.drawImage(buttonImage, leftState * 64, 0, 64, 64, 30, canvas.height - 70, 64, 64);
     context.drawImage(buttonImage, rightState * 64 + 128, 0, 64, 64, canvas.width - 94, canvas.height - 70, 64, 64);
-    // prevDoodleY = doodle.y;
+    // prevplayerY = player.y;
 
     // platforms = platforms.filter(function(platform) {
     //   return platform.y < canvas.height;
@@ -201,8 +198,8 @@ function initialize() {
   time = 60
   // minPlatformSpace = 15;
   // maxPlatformSpace = 20;
-  // doodle.x = canvas.width / 2 - 20
-  // doodle.y = platformStart - 60
+  player.x = canvas.width / 2 - 32;
+  player.y = 74;
   // platforms = [{ x: canvas.width / 2 - platformWidth / 2, y: platformStart}]
   // let y = platformStart;
   // while (y > 0) {
@@ -235,8 +232,7 @@ function backgroundMove() {
   }
 }
 
-// setInterval(display, 120);
-
+setInterval(display, 120);
 setInterval(decrement, 1000);
 setInterval(backgroundMove, 10);
 
@@ -255,15 +251,13 @@ document.addEventListener('mousedown', function(e) {
     return;
   if (relativeX >= 30 && relativeX <= 94) {
     leftState = 1;
-    // playerDir = -1;
-    // doodle.dx = -3;
-
-  }
-  else if (relativeX >= canvas.width - 94 && relativeX <= canvas.width - 30) {
+    playerDir = -1;
+    player.dx = -3;
+  } else if (relativeX >= canvas.width - 94 && relativeX <= canvas.width - 30) {
     leftState = 0;
     rightState = 1;
-    // playerDir = 1;
-    // doodle.dx = 3;
+    playerDir = 1;
+    player.dx = 3;
   }
 });
 
