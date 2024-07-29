@@ -52,7 +52,8 @@ playerImage.src = "mole.png"
 
 let diamonds = [{
   x: canvas.width / 2 - diamondWidth / 2,
-  y: diamondStart
+  y: diamondStart,
+  activ: true
 }];
 
 function random(min, max) {
@@ -82,6 +83,8 @@ background.src = "background.png"
 let by = 0;
 let by2 = canvas.height;
 
+let score = 0;
+
 initialize();
 
 function display() {
@@ -96,17 +99,6 @@ function loop() {
   context.clearRect(0,0,canvas.width,canvas.height);
 
   if (!end) {
-    // if (player.y < canvas.height / 2 && player.dy < 0) {
-      // diamonds.forEach(function(diamond) {
-      //   diamond.y += -player.dy;
-      // });
-      //   minDiamondSpace += 0.5;
-      //   maxDiamondSpace += 0.5;
-      //   maxDiamondSpace = Math.min(maxDiamondSpace, canvas.height / 2);
-    // } else {
-    //   player.y += player.dy;
-    // }
-
     if (!mousedown) {
       if (playerDir < 0) {
         player.dx += drag;
@@ -142,42 +134,37 @@ function loop() {
     context.drawImage(background, 0, 0, 320, 480, 0, by2, canvas.width, canvas.height);
 
     diamonds.forEach(function(diamond) {
-      context.drawImage(diamondImage, 0, 0, diamondWidth, diamondHeight, diamond.x, diamond.y, diamondWidth / 2, diamondHeight / 2);
-
-      // if (
-      //   player.dy > 0 &&
-      //   prevplayerY + player.height <= diamond.y &&
-      //   player.x < diamond.x + diamondWidth &&
-      //   player.x + player.width > diamond.x &&
-      //   player.y < diamond.y + diamondHeight &&
-      //   player.y + player.height > diamond.y
-      // ) {
-      //   player.y = diamond.y - player.height;
-      //   player.dy = bounceVelocity;
-      // }
+      if (diamond.activ) {
+        if (collide(diamond)) {
+          diamond.activ = false;
+          score++;
+        }
+        context.drawImage(diamondImage, 0, 0, diamondWidth, diamondHeight, diamond.x, diamond.y, diamondWidth / 2, diamondHeight / 2);
+      }
     });
 
     context.drawImage(playerImage, frameOrder[player.currentFrame] * 64, 0, 64, 64, player.x, player.y, player.width, player.height);
 
     context.font = "30px Arial";
     context.fillStyle = 'yellow';
-    context.fillText(Math.round(player.dx), canvas.width - (Math.round(player.dx).toString().length + 1) * 20, 40)
+    context.textAlign = "left";
+    context.fillText(score, canvas.width - (score.toString().length + 1) * 20, 40)
     context.fillText("Time left : " + time, 10, 40)
 
     context.drawImage(buttonImage, leftState * 64, 0, 64, 64, 30, canvas.height - 70, 64, 64);
     context.drawImage(buttonImage, rightState * 64 + 128, 0, 64, 64, canvas.width - 94, canvas.height - 70, 64, 64);
-    // prevplayerY = player.y;
 
     diamonds = diamonds.filter(function(diamond) {
       return diamond.y > -diamondHeight;
     })
   } else {
     context.drawImage(background, 0, 0, 320, 480, 0, 0, canvas.width, canvas.height);
-    // context.fillText("Maximum height", 10, canvas.height / 2 - 40);
-    // context.fillText("reached :", 10, canvas.height / 2);
-    // context.fillText(Math.round(meters) + "m", 10, canvas.height / 2 + 60)
+    context.textAlign = "center";
+    context.font = "40px Arial";
+    context.fillText("Your score :", canvas.width / 2, canvas.height / 2 - 40);
+    context.fillText(score, canvas.width / 2, canvas.height / 2);
     context.font = "20px Arial";
-    context.fillText("tap to restart", canvas.width - 15 * 17, canvas.height - 10);
+    context.fillText("tap to restart", canvas.width / 2, canvas.height - 10);
     if (mousedown) {
       end = false;
     }
@@ -192,7 +179,7 @@ function initialize() {
   maxDiamondSpace = 20;
   player.x = canvas.width / 2 - 32;
   player.y = 74;
-  diamonds = [{ x: canvas.width / 2 - diamondWidth / 2, y: diamondStart}]
+  diamonds = [{ x: canvas.width / 2 - diamondWidth / 2, y: diamondStart,  activ: true}]
   let y = diamondStart;
   while (y < canvas.height - diamondHeight) {
     y += diamondHeight + random(minDiamondSpace, maxDiamondSpace);
@@ -200,7 +187,7 @@ function initialize() {
     do {
       x = random(55, canvas.width - 55 - diamondWidth);
     } while (
-      y > canvas.height / 2 &&
+      y < canvas.height &&
       x > canvas.width / 2 - diamondWidth * 1.5 &&
       x < canvas.width / 2 + diamondWidth / 2
     );
@@ -230,8 +217,20 @@ function backgroundMove() {
 function addElement() {
   diamonds.push({
     x: random(55, canvas.width - 55 - diamondWidth),
-    y: canvas.height
+    y: canvas.height,
+    activ: true
   })
+}
+
+function collide(ent) {
+  if (!end) {
+    if (ent.y > player.y + player.height || player.y > ent.y + diamondHeight / 2)
+      return false;
+    if (ent.x > player.x + player.width || player.x > ent.x + diamondWidth / 2)
+      return false;
+    return true;
+  }
+  return false;
 }
 
 setInterval(display, 120);
