@@ -74,10 +74,12 @@ const player = {
   x: canvas.width / 2 - 32,
   y: 74,
   dx: 0,
-  dy: 0,
   nbFrames: 4,
   currentFrame: 0,
-  lastFrame: 2
+  boxX: canvas.width / 2 - 32,
+  boxY: 74,
+  boxWidth: 32,
+  boxHeight: 64
 };
 
 let frameOrder = [0, 1, 0, 2];
@@ -126,6 +128,8 @@ function loop() {
     }
 
     player.x += player.dx;
+    player.boxX = player.x + 16;
+    player.boxY = player.y;
 
     if (player.x < borderThickness) {
       player.x = borderThickness;
@@ -158,7 +162,6 @@ function loop() {
       }
       context.drawImage(obstacleImage, 0, 0, diamondWidth, diamondHeight, obstacle.x, obstacle.y, diamondWidth / 2, diamondHeight / 2);
     });
-
     context.drawImage(playerImage, frameOrder[player.currentFrame] * 64, 0, 64, 64, player.x, player.y, player.width, player.height);
 
     context.font = "30px Arial";
@@ -254,9 +257,9 @@ function addObstacle() {
 
 function collide(ent) {
   if (!end) {
-    if (ent.y > player.y + player.height || player.y > ent.y + diamondHeight / 2)
+    if (ent.y > player.boxY + player.boxHeight || player.boxY > ent.y + diamondHeight / 2)
       return false;
-    if (ent.x > player.x + player.width || player.x > ent.x + diamondWidth / 2)
+    if (ent.x > player.boxX + player.boxWidth || player.boxX > ent.x + diamondWidth / 2)
       return false;
     return true;
   }
