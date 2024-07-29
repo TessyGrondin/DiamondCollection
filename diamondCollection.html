@@ -26,15 +26,15 @@
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 
-// const platformWidth = 65;
-// const platformHeight = 20;
-// const platformStart = canvas.height - 50;
+const diamondWidth = 64;
+const diamondHeight = 64;
+const diamondStart = canvas.height / 2;
 
 const drag = 0.3;
 // const bounceVelocity = -12.5;
 
-// let minPlatformSpace = 15;
-// let maxPlatformSpace = 20;
+let minDiamondSpace = 15;
+let maxDiamondSpace = 20;
 
 let leftState = 0;
 let rightState = 0;
@@ -43,22 +43,22 @@ let borderThickness = 30;
 
 let end = false;
 
-// let platformImage = new Image();
-// platformImage.src = "diamond.png"
+let diamondImage = new Image();
+diamondImage.src = "diamond.png"
 
 let buttonImage = new Image();
 buttonImage.src = "button.png"
 let playerImage = new Image();
 playerImage.src = "mole.png"
 
-// let platforms = [{
-//   x: canvas.width / 2 - platformWidth / 2,
-//   y: platformStart
-// }];
+let diamonds = [{
+  x: canvas.width / 2 - diamondWidth / 2,
+  y: diamondStart
+}];
 
-// function random(min, max) {
-//   return Math.random() * (max - min) + min;
-// }
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 const player = {
   width: 64,
@@ -98,17 +98,17 @@ function loop() {
 
   if (!end) {
     // if (player.y < canvas.height / 2 && player.dy < 0) {
-      // platforms.forEach(function(platform) {
-      //   platform.y += -player.dy;
+      // diamonds.forEach(function(diamond) {
+      //   diamond.y += -player.dy;
       // });
-      // while (platforms[platforms.length - 1].y > 0) {
-      //   platforms.push({
-      //     x: random(25, canvas.width - 25 - platformWidth),
-      //     y: platforms[platforms.length - 1].y - (platformHeight + random(minPlatformSpace, maxPlatformSpace))
+      // while (diamonds[diamonds.length - 1].y > 0) {
+      //   diamonds.push({
+      //     x: random(25, canvas.width - 25 - diamondWidth),
+      //     y: diamonds[diamonds.length - 1].y - (diamondHeight + random(minDiamondSpace, maxDiamondSpace))
       //   })
-      //   minPlatformSpace += 0.5;
-      //   maxPlatformSpace += 0.5;
-      //   maxPlatformSpace = Math.min(maxPlatformSpace, canvas.height / 2);
+      //   minDiamondSpace += 0.5;
+      //   maxDiamondSpace += 0.5;
+      //   maxDiamondSpace = Math.min(maxDiamondSpace, canvas.height / 2);
       // }
     // } else {
     //   player.y += player.dy;
@@ -148,21 +148,21 @@ function loop() {
     context.drawImage(background, 0, 0, 320, 480, 0, by, canvas.width, canvas.height);
     context.drawImage(background, 0, 0, 320, 480, 0, by2, canvas.width, canvas.height);
 
-    // platforms.forEach(function(platform) {
-    //   context.drawImage(platformImage, 0, 0, 80, 16, platform.x, platform.y, platformWidth, platformHeight);
+    diamonds.forEach(function(diamond) {
+      context.drawImage(diamondImage, 0, 0, diamondWidth, diamondHeight, diamond.x, diamond.y, diamondWidth / 2, diamondHeight / 2);
 
       // if (
       //   player.dy > 0 &&
-      //   prevplayerY + player.height <= platform.y &&
-      //   player.x < platform.x + platformWidth &&
-      //   player.x + player.width > platform.x &&
-      //   player.y < platform.y + platformHeight &&
-      //   player.y + player.height > platform.y
+      //   prevplayerY + player.height <= diamond.y &&
+      //   player.x < diamond.x + diamondWidth &&
+      //   player.x + player.width > diamond.x &&
+      //   player.y < diamond.y + diamondHeight &&
+      //   player.y + player.height > diamond.y
       // ) {
-      //   player.y = platform.y - player.height;
+      //   player.y = diamond.y - player.height;
       //   player.dy = bounceVelocity;
       // }
-    // });
+    });
 
     context.drawImage(playerImage, frameOrder[player.currentFrame] * 64, 0, 64, 64, player.x, player.y, player.width, player.height);
 
@@ -175,9 +175,9 @@ function loop() {
     context.drawImage(buttonImage, rightState * 64 + 128, 0, 64, 64, canvas.width - 94, canvas.height - 70, 64, 64);
     // prevplayerY = player.y;
 
-    // platforms = platforms.filter(function(platform) {
-    //   return platform.y < canvas.height;
-    // })
+    diamonds = diamonds.filter(function(diamond) {
+      return diamond.y > -diamondHeight;
+    })
   } else {
     context.drawImage(background, 0, 0, 320, 480, 0, 0, canvas.width, canvas.height);
     // context.fillText("Maximum height", 10, canvas.height / 2 - 40);
@@ -196,24 +196,24 @@ function initialize() {
   leftState = 0
   rightState = 0
   time = 60
-  // minPlatformSpace = 15;
-  // maxPlatformSpace = 20;
+  minDiamondSpace = 15;
+  maxDiamondSpace = 20;
   player.x = canvas.width / 2 - 32;
   player.y = 74;
-  // platforms = [{ x: canvas.width / 2 - platformWidth / 2, y: platformStart}]
-  // let y = platformStart;
-  // while (y > 0) {
-  //   y -= platformHeight + random(minPlatformSpace, maxPlatformSpace);
-  //   let x;
-  //   do {
-  //     x = random(25, canvas.width - 25 - platformWidth);
-  //   } while (
-  //     y > canvas.height / 2 &&
-  //     x > canvas.width / 2 - platformWidth * 1.5 &&
-  //     x < canvas.width / 2 + platformWidth / 2
-  //   );
-  //   platforms.push({ x, y });
-  // }
+  diamonds = [{ x: canvas.width / 2 - diamondWidth / 2, y: diamondStart}]
+  let y = diamondStart;
+  while (y < canvas.height - diamondHeight) {
+    y += diamondHeight + random(minDiamondSpace, maxDiamondSpace);
+    let x;
+    do {
+      x = random(25, canvas.width - 25 - diamondWidth);
+    } while (
+      y > canvas.height / 2 &&
+      x > canvas.width / 2 - diamondWidth * 1.5 &&
+      x < canvas.width / 2 + diamondWidth / 2
+    );
+    diamonds.push({ x, y });
+  }
 }
 
 function decrement()
@@ -229,6 +229,9 @@ function backgroundMove() {
       by = canvas.height;
     if (by2 == -canvas.height)
       by2 = canvas.height;
+    diamonds.forEach(function(diamond) {
+      diamond.y--;
+    });
   }
 }
 
